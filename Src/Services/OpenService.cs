@@ -91,23 +91,22 @@ public sealed class OpenService : ZjuServiceBase, IOpenService
 
     /// <inheritdoc />
     public override async Task<HttpResponseMessage> FetchAsync(
-        string url,
-        Action<HttpRequestMessage>? configureRequest = null,
+        HttpRequestMessage request,
         CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(request);
         await EnsureLoggedInAsync(cancellationToken);
-
-        var request = new HttpRequestMessage(HttpMethod.Get, url);
 
         // Apply the required headers for open.zju.edu.cn.
         foreach (var (key, value) in SaferHeaders)
         {
-            request.Headers.TryAddWithoutValidation(key, value);
+            if (!request.Headers.Contains(key))
+            {
+                request.Headers.TryAddWithoutValidation(key, value);
+            }
         }
 
         request.Headers.TryAddWithoutValidation("x-csrf-token", _xcsrfToken);
-
-        configureRequest?.Invoke(request);
 
         return await Http.SendFollowingRedirectsAsync(request, cancellationToken);
     }

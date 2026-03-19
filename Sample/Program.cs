@@ -66,19 +66,19 @@ if (IsEnabled("TEST_ZDBK"))
 
     // Query class schedule (课表查询)
     var su = Env("ZJUAM_USERNAME");
-    var response = await zdbk.FetchAsync(
-        $"https://zdbk.zju.edu.cn/jwglxt/kbcx/xskbcx_cxXsKb.html?gnmkdm=N253508&su={su}",
-        request =>
+    var zdbkRequest = new HttpRequestMessage(
+        HttpMethod.Post,
+        $"https://zdbk.zju.edu.cn/jwglxt/kbcx/xskbcx_cxXsKb.html?gnmkdm=N253508&su={su}")
+    {
+        Content = new FormUrlEncodedContent(new Dictionary<string, string>
         {
-            request.Method = HttpMethod.Post;
-            request.Headers.Add("X-Requested-With", "XMLHttpRequest");
-            request.Content = new FormUrlEncodedContent(new Dictionary<string, string>
-            {
-                ["xnm"] = "2024-2025",
-                ["xqm"] = "2|春、夏",
-                ["xqmmc"] = "春、夏",
-            });
-        });
+            ["xnm"] = "2024-2025",
+            ["xqm"] = "2|春、夏",
+            ["xqmmc"] = "春、夏",
+        })
+    };
+    zdbkRequest.Headers.Add("X-Requested-With", "XMLHttpRequest");
+    var response = await zdbk.FetchAsync(zdbkRequest);
     var body = await response.Content.ReadAsStringAsync();
     Console.WriteLine($"ZDBK response: {response.StatusCode}, length={body.Length}");
     Console.WriteLine(body);
@@ -94,7 +94,8 @@ if (IsEnabled("TEST_COURSES"))
     using var courses = factory.CreateCourses(auth!);
 
     // Query pending todos
-    var response = await courses.FetchAsync("https://courses.zju.edu.cn/api/todos?no-intercept=true");
+    var response = await courses.FetchAsync(
+        new HttpRequestMessage(HttpMethod.Get, "https://courses.zju.edu.cn/api/todos?no-intercept=true"));
     var body = await response.Content.ReadAsStringAsync();
     Console.WriteLine($"Courses response: {response.StatusCode}, length={body.Length}");
     Console.WriteLine(body);
@@ -108,7 +109,7 @@ if (IsEnabled("TEST_CLASSROOM"))
 {
     Console.WriteLine("\n=== Classroom ===");
     using var classroom = factory.CreateClassroom(auth!);
-    var response = await classroom.FetchAsync("https://classroom.zju.edu.cn/");
+    var response = await classroom.FetchAsync(new HttpRequestMessage(HttpMethod.Get, "https://classroom.zju.edu.cn/"));
     var body = await response.Content.ReadAsStringAsync();
     Console.WriteLine($"Classroom response: {response.StatusCode}, length={body.Length}");
     Console.WriteLine(body);
@@ -122,7 +123,8 @@ if (IsEnabled("TEST_FORM"))
 {
     Console.WriteLine("\n=== Form ===");
     using var form = factory.CreateForm(auth!);
-    var response = await form.FetchAsync("https://form.zju.edu.cn/dfi/formSetting/queryListPage?pageNo=1&pageSize=10");
+    var response = await form.FetchAsync(
+        new HttpRequestMessage(HttpMethod.Get, "https://form.zju.edu.cn/dfi/formSetting/queryListPage?pageNo=1&pageSize=10"));
     var body = await response.Content.ReadAsStringAsync();
     Console.WriteLine($"Form response: {response.StatusCode}, length={body.Length}");
     Console.WriteLine(body);
@@ -136,7 +138,8 @@ if (IsEnabled("TEST_YQFKGL"))
 {
     Console.WriteLine("\n=== Yqfkgl ===");
     using var yqfkgl = factory.CreateYqfkgl(auth!);
-    var response = await yqfkgl.FetchAsync("https://yqfkgl.zju.edu.cn/_web/_customizes/ykt/index3.jsp");
+    var response = await yqfkgl.FetchAsync(
+        new HttpRequestMessage(HttpMethod.Get, "https://yqfkgl.zju.edu.cn/_web/_customizes/ykt/index3.jsp"));
     var body = await response.Content.ReadAsStringAsync();
     Console.WriteLine($"Yqfkgl response: {response.StatusCode}, length={body.Length}");
     Console.WriteLine(body);
@@ -150,7 +153,7 @@ if (IsEnabled("TEST_OPEN"))
 {
     Console.WriteLine("\n=== Open ===");
     using var open = factory.CreateOpen(auth!);
-    var response = await open.FetchAsync("https://open.zju.edu.cn/api/user/info");
+    var response = await open.FetchAsync(new HttpRequestMessage(HttpMethod.Get, "https://open.zju.edu.cn/api/user/info"));
     var body = await response.Content.ReadAsStringAsync();
     Console.WriteLine($"Open response: {response.StatusCode}, length={body.Length}");
     Console.WriteLine(body);
@@ -181,7 +184,7 @@ if (IsEnabled("TEST_CC98"))
     Console.WriteLine("\n=== CC98 ===");
     var cc98Factory = provider.GetRequiredService<ICc98ServiceFactory>();
     using var cc98 = cc98Factory.Create(Env("CC98_USERNAME"), Env("CC98_PASSWORD"));
-    var response = await cc98.FetchAsync("https://api.cc98.org/me");
+    var response = await cc98.FetchAsync(new HttpRequestMessage(HttpMethod.Get, "https://api.cc98.org/me"));
     var body = await response.Content.ReadAsStringAsync();
     Console.WriteLine($"CC98 response: {response.StatusCode}, length={body.Length}");
     Console.WriteLine(body);

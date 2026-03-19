@@ -44,14 +44,11 @@ public sealed partial class ZjuamAuth : IZjuamAuth
 
     /// <inheritdoc />
     public async Task<HttpResponseMessage> FetchAsync(
-        string url,
-        Action<HttpRequestMessage>? configureRequest = null,
+        HttpRequestMessage request,
         CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(request);
         await EnsureLoggedInAsync(cancellationToken);
-
-        var request = new HttpRequestMessage(HttpMethod.Get, url);
-        configureRequest?.Invoke(request);
         return await _http.SendFollowingRedirectsAsync(request, cancellationToken);
     }
 

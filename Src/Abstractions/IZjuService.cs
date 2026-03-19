@@ -11,14 +11,12 @@ public interface IZjuService : IDisposable
     Task LoginAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Sends an authenticated HTTP request to the specified URL.
+    /// Sends an authenticated HTTP request.
     /// Automatically calls <see cref="LoginAsync"/> on first use if not already logged in.
     /// </summary>
-    /// <param name="url">The target URL.</param>
-    /// <param name="configureRequest">Optional action to configure the <see cref="HttpRequestMessage"/> (e.g. set method, headers, body).</param>
+    /// <param name="request">The request message to send.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     Task<HttpResponseMessage> FetchAsync(
-        string url,
-        Action<HttpRequestMessage>? configureRequest = null,
+        HttpRequestMessage request,
         CancellationToken cancellationToken = default);
 }

@@ -68,17 +68,16 @@ public sealed class FormService : IFormService
 
     /// <inheritdoc />
     public async Task<HttpResponseMessage> FetchAsync(
-        string url,
-        Action<HttpRequestMessage>? configureRequest = null,
+        HttpRequestMessage request,
         CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(request);
         await EnsureLoggedInAsync(cancellationToken);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, url);
-        request.Headers.TryAddWithoutValidation("authentication", _token);
-        configureRequest?.Invoke(request);
+        using var firstRequest = await HttpRequestMessageHelper.CloneAsync(request, cancellationToken);
+        firstRequest.Headers.TryAddWithoutValidation("authentication", _token);
 
-        var response = await _httpClient.SendAsync(request, cancellationToken);
+        var response = await _httpClient.SendAsync(firstRequest, cancellationToken);
 
         if (response.StatusCode == HttpStatusCode.Unauthorized || response.StatusCode == HttpStatusCode.Forbidden)
         {
@@ -86,10 +85,9 @@ public sealed class FormService : IFormService
             _token = "";
             await LoginAsync(cancellationToken);
 
-            request = new HttpRequestMessage(HttpMethod.Get, url);
-            request.Headers.TryAddWithoutValidation("authentication", _token);
-            configureRequest?.Invoke(request);
-            response = await _httpClient.SendAsync(request, cancellationToken);
+            using var retryRequest = await HttpRequestMessageHelper.CloneAsync(request, cancellationToken);
+            retryRequest.Headers.TryAddWithoutValidation("authentication", _token);
+            response = await _httpClient.SendAsync(retryRequest, cancellationToken);
         }
 
         return response;

@@ -81,10 +81,10 @@ public sealed class Cc98Service : ICc98Service
 
     /// <inheritdoc />
     public async Task<HttpResponseMessage> FetchAsync(
-        string url,
-        Action<HttpRequestMessage>? configureRequest = null,
+        HttpRequestMessage request,
         CancellationToken cancellationToken = default)
     {
+        ArgumentNullException.ThrowIfNull(request);
         await EnsureLoggedInAsync(cancellationToken);
 
         // Refresh the token if it's about to expire.
@@ -93,9 +93,7 @@ public sealed class Cc98Service : ICc98Service
             await RefreshTokenAsync(cancellationToken);
         }
 
-        var request = new HttpRequestMessage(HttpMethod.Get, url);
         request.Headers.TryAddWithoutValidation("Authorization", $"{_tokenType} {_accessToken}");
-        configureRequest?.Invoke(request);
 
         return await _httpClient.SendAsync(request, cancellationToken);
     }
@@ -104,13 +102,12 @@ public sealed class Cc98Service : ICc98Service
     {
         _logger.LogInformation("[CC98] Refreshing token...");
 
-        var content = new FormUrlEncodedContent(new KeyValuePair<string, string>[]
-        {
-            new("client_id", _clientId),
-            new("client_secret", _clientSecret),
-            new("refresh_token", _refreshToken),
-            new("grant_type", "refresh_token"),
-        });
+        var content = new FormUrlEncodedContent([
+            new KeyValuePair<string, string>("client_id", _clientId),
+            new KeyValuePair<string, string>("client_secret", _clientSecret),
+            new KeyValuePair<string, string>("refresh_token", _refreshToken),
+            new KeyValuePair<string, string>("grant_type", "refresh_token")
+        ]);
 
         var response = await _httpClient.PostAsync(TokenUrl, content, ct);
         var json = await response.Content.ReadAsStringAsync(ct);
