@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using System.Net;
 
 namespace LoginZju;
@@ -20,9 +19,9 @@ public sealed class ZdbkService : ZjuServiceBase, IZdbkService
     /// Initializes a new instance of <see cref="ZdbkService"/>.
     /// </summary>
     /// <param name="auth">An authenticated <see cref="IZjuamAuth"/> instance.</param>
-    /// <param name="logger">Optional logger.</param>
-    public ZdbkService(IZjuamAuth auth, ILogger<ZdbkService>? logger = null)
-        : base(auth, logger ?? NullLogger<ZdbkService>.Instance) { }
+    /// <param name="logger">Logger instance.</param>
+    public ZdbkService(IZjuamAuth auth, ILogger<ZdbkService> logger)
+        : base(auth, logger) { }
 
     /// <inheritdoc />
     public override async Task LoginAsync(CancellationToken cancellationToken = default)

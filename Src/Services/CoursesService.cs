@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace LoginZju;
 
@@ -18,9 +17,9 @@ public sealed class CoursesService : ZjuServiceBase, ICoursesService
     /// Initializes a new instance of <see cref="CoursesService"/>.
     /// </summary>
     /// <param name="auth">An authenticated <see cref="IZjuamAuth"/> instance.</param>
-    /// <param name="logger">Optional logger.</param>
-    public CoursesService(IZjuamAuth auth, ILogger<CoursesService>? logger = null)
-        : base(auth, logger ?? NullLogger<CoursesService>.Instance) { }
+    /// <param name="logger">Logger instance.</param>
+    public CoursesService(IZjuamAuth auth, ILogger<CoursesService> logger)
+        : base(auth, logger) { }
 
     /// <inheritdoc />
     public override async Task LoginAsync(CancellationToken cancellationToken = default)

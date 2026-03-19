@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace LoginZju;
 
@@ -17,9 +16,9 @@ public sealed class YqfkglService : ZjuServiceBase, IYqfkglService
     /// Initializes a new instance of <see cref="YqfkglService"/>.
     /// </summary>
     /// <param name="auth">An authenticated <see cref="IZjuamAuth"/> instance.</param>
-    /// <param name="logger">Optional logger.</param>
-    public YqfkglService(IZjuamAuth auth, ILogger<YqfkglService>? logger = null)
-        : base(auth, logger ?? NullLogger<YqfkglService>.Instance) { }
+    /// <param name="logger">Logger instance.</param>
+    public YqfkglService(IZjuamAuth auth, ILogger<YqfkglService> logger)
+        : base(auth, logger) { }
 
     /// <inheritdoc />
     public override async Task LoginAsync(CancellationToken cancellationToken = default)

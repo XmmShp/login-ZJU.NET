@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using System.Net;
 using System.Text.RegularExpressions;
 
@@ -27,8 +26,8 @@ public sealed partial class ZjuamAuth : IZjuamAuth
     /// </summary>
     /// <param name="username">ZJU unified identity username.</param>
     /// <param name="password">ZJU unified identity password.</param>
-    /// <param name="logger">Optional logger instance.</param>
-    public ZjuamAuth(string username, string password, ILogger<ZjuamAuth>? logger = null)
+    /// <param name="logger">Logger instance.</param>
+    public ZjuamAuth(string username, string password, ILogger<ZjuamAuth> logger)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(username);
         ArgumentException.ThrowIfNullOrWhiteSpace(password);
@@ -36,7 +35,7 @@ public sealed partial class ZjuamAuth : IZjuamAuth
         _username = username;
         _password = password;
         _http = new CookieHttpClient();
-        _logger = logger ?? NullLogger<ZjuamAuth>.Instance;
+        _logger = logger;
     }
 
     /// <inheritdoc />

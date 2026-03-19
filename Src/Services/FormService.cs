@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
@@ -29,12 +28,12 @@ public sealed class FormService : IFormService
     /// Initializes a new instance of <see cref="FormService"/>.
     /// </summary>
     /// <param name="auth">An authenticated <see cref="IZjuamAuth"/> instance.</param>
-    /// <param name="logger">Optional logger.</param>
-    public FormService(IZjuamAuth auth, ILogger<FormService>? logger = null)
+    /// <param name="logger">Logger instance.</param>
+    public FormService(IZjuamAuth auth, ILogger<FormService> logger)
     {
         _auth = auth;
         _httpClient = new HttpClient();
-        _logger = logger ?? NullLogger<FormService>.Instance;
+        _logger = logger;
     }
 
     /// <inheritdoc />
@@ -81,8 +80,7 @@ public sealed class FormService : IFormService
 
         var response = await _httpClient.SendAsync(request, cancellationToken);
 
-        if (response.StatusCode is HttpStatusCode.Unauthorized
-            or HttpStatusCode.Forbidden)
+        if (response.StatusCode == HttpStatusCode.Unauthorized || response.StatusCode == HttpStatusCode.Forbidden)
         {
             _logger.LogWarning("[FORM] Token expired, re-authenticating...");
             _token = "";

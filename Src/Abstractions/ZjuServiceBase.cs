@@ -7,20 +7,19 @@ namespace LoginZju;
 /// </summary>
 public abstract class ZjuServiceBase : IZjuService
 {
-    private readonly CookieHttpClient _http;
     private readonly SemaphoreSlim _loginLock = new(1, 1);
     private bool _loggedIn;
 
     private protected ZjuServiceBase(IZjuamAuth auth, ILogger logger)
     {
         Auth = auth;
-        _http = new CookieHttpClient();
+        Http = new CookieHttpClient();
         Logger = logger;
     }
 
     private protected IZjuamAuth Auth { get; }
 
-    private protected CookieHttpClient Http => _http;
+    private protected CookieHttpClient Http { get; }
 
     private protected ILogger Logger { get; }
 
@@ -37,7 +36,7 @@ public abstract class ZjuServiceBase : IZjuService
 
         var request = new HttpRequestMessage(HttpMethod.Get, url);
         configureRequest?.Invoke(request);
-        return await _http.SendFollowingRedirectsAsync(request, cancellationToken);
+        return await Http.SendFollowingRedirectsAsync(request, cancellationToken);
     }
 
     private protected async Task EnsureLoggedInAsync(CancellationToken ct)
@@ -76,7 +75,7 @@ public abstract class ZjuServiceBase : IZjuService
     {
         if (disposing)
         {
-            _http.Dispose();
+            Http.Dispose();
             _loginLock.Dispose();
         }
     }

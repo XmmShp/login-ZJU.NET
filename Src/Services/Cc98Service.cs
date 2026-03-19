@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using System.Text.Json;
 
 namespace LoginZju;
@@ -34,21 +33,22 @@ public sealed class Cc98Service : ICc98Service
     /// <param name="username">CC98 username.</param>
     /// <param name="password">CC98 password.</param>
     /// <param name="options">App-level CC98 options (ClientId, ClientSecret).</param>
-    /// <param name="logger">Optional logger.</param>
-    public Cc98Service(string username, string password, Cc98Options options, ILogger<Cc98Service>? logger = null)
+    /// <param name="logger">Logger instance.</param>
+    public Cc98Service(string username, string password, Cc98Options options, ILogger<Cc98Service> logger)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(username);
         ArgumentException.ThrowIfNullOrWhiteSpace(password);
         ArgumentNullException.ThrowIfNull(options);
         ArgumentException.ThrowIfNullOrWhiteSpace(options.ClientId);
         ArgumentException.ThrowIfNullOrWhiteSpace(options.ClientSecret);
+        ArgumentNullException.ThrowIfNull(logger);
 
         _username = username;
         _password = password;
         _clientId = options.ClientId;
         _clientSecret = options.ClientSecret;
         _httpClient = new HttpClient();
-        _logger = logger ?? NullLogger<Cc98Service>.Instance;
+        _logger = logger;
     }
 
     /// <inheritdoc />
@@ -56,14 +56,13 @@ public sealed class Cc98Service : ICc98Service
     {
         _logger.LogInformation("[CC98] Login begins.");
 
-        var content = new FormUrlEncodedContent(new KeyValuePair<string, string>[]
-        {
-            new("client_id", _clientId),
-            new("client_secret", _clientSecret),
-            new("username", _username),
-            new("password", _password),
-            new("grant_type", "password"),
-        });
+        var content = new FormUrlEncodedContent([
+            new KeyValuePair<string, string>("client_id", _clientId),
+            new KeyValuePair<string, string>("client_secret", _clientSecret),
+            new KeyValuePair<string, string>("username", _username),
+            new KeyValuePair<string, string>("password", _password),
+            new KeyValuePair<string, string>("grant_type", "password")
+        ]);
 
         var response = await _httpClient.PostAsync(TokenUrl, content, cancellationToken);
         var json = await response.Content.ReadAsStringAsync(cancellationToken);

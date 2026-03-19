@@ -10,10 +10,10 @@ public sealed class Cc98Options
     /// <summary>
     /// OAuth2 client ID for CC98 OpenID Connect.
     /// </summary>
-    public string ClientId { get; set; } = "";
+    public string ClientId { get; set; } = string.Empty;
 
     /// <summary>
     /// OAuth2 client secret for CC98 OpenID Connect.
     /// </summary>
-    public string ClientSecret { get; set; } = "";
+    public string ClientSecret { get; set; } = string.Empty;
 }

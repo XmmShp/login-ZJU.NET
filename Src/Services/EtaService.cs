@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -23,9 +22,9 @@ public sealed class EtaService : ZjuServiceBase, IEtaService
     /// Initializes a new instance of <see cref="EtaService"/>.
     /// </summary>
     /// <param name="auth">An authenticated <see cref="IZjuamAuth"/> instance.</param>
-    /// <param name="logger">Optional logger.</param>
-    public EtaService(IZjuamAuth auth, ILogger<EtaService>? logger = null)
-        : base(auth, logger ?? NullLogger<EtaService>.Instance) { }
+    /// <param name="logger">Logger instance.</param>
+    public EtaService(IZjuamAuth auth, ILogger<EtaService> logger)
+        : base(auth, logger) { }
 
     /// <inheritdoc />
     public override async Task LoginAsync(CancellationToken cancellationToken = default)
