@@ -13,22 +13,11 @@ public static class ServiceCollectionExtensions
         /// <summary>
         /// Registers <see cref="ILoginZjuFactory"/> for creating per-user ZJUAM auth and service instances.
         /// </summary>
-        /// <returns>The <see cref="IServiceCollection"/> for further chaining.</returns>
-        public IServiceCollection AddLoginZju()
-        {
-            services.AddSingleton<ILoginZjuFactory, LoginZjuFactory>();
-            return services;
-        }
-
-        /// <summary>
-        /// Registers <see cref="ICc98ServiceFactory"/> for creating per-user CC98 service instances.
-        /// CC98 uses a separate account system, not ZJUAM. The app-level OAuth2 client credentials
-        /// (ClientId, ClientSecret) are configured here; per-user credentials are provided at creation time.
-        /// </summary>
         /// <param name="configure">Action to configure <see cref="Cc98Options"/> (ClientId, ClientSecret, TokenUrl).</param>
         /// <returns>The <see cref="IServiceCollection"/> for further chaining.</returns>
-        public IServiceCollection AddLoginZjuCc98(Action<Cc98Options>? configure = null)
+        public IServiceCollection AddLoginZju(Action<Cc98Options>? configure = null)
         {
+            services.AddSingleton<ILoginZjuFactory, LoginZjuFactory>();
             if (configure is not null)
             {
                 services.Configure(configure);
