@@ -53,6 +53,17 @@ if (IsEnabled("TEST_ZJUAM"))
     Console.WriteLine("=== ZJUAM ===");
     await auth!.LoginAsync();
     Console.WriteLine("ZJUAM login OK");
+
+    var serviceCallbackUrl = await auth.LoginServiceAsync("https://service.zju.edu.cn/");
+    var callbackResponse = await auth.FetchAsync(new HttpRequestMessage(HttpMethod.Get, serviceCallbackUrl));
+    Console.WriteLine($"service.zju.edu.cn CAS callback: {callbackResponse.StatusCode}");
+
+    var loginInfoResponse = await auth.FetchAsync(new HttpRequestMessage(
+        HttpMethod.Get,
+        "https://service.zju.edu.cn/_web/portal/api/user/loginInfo.rst?_p=YXM9MiZ0PTUmZD0xMzMmcD0xJmY9MjImbT1OJg__"));
+    var loginInfoBody = await loginInfoResponse.Content.ReadAsStringAsync();
+    Console.WriteLine($"service.zju.edu.cn loginInfo response: {loginInfoResponse.StatusCode}, length={loginInfoBody.Length}");
+    Console.WriteLine(loginInfoBody);
 }
 
 // ============================================================
