@@ -1,0 +1,104 @@
+root = true
+
+[*]
+indent_style = space
+indent_size = 4
+end_of_line = crlf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.{csproj,props,targets,slnx,yml,yaml,json,xml}]
+indent_size = 2
+
+[*.cs]
+# Formatting
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+
+# Braces: always required for all statement blocks
+csharp_prefer_braces = true:error
+
+# Expression-level preferences
+csharp_style_expression_bodied_methods = when_on_single_line:suggestion
+csharp_style_expression_bodied_constructors = false:suggestion
+csharp_style_expression_bodied_properties = true:suggestion
+csharp_style_expression_bodied_accessors = true:suggestion
+
+# var preferences
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = true:suggestion
+
+# Using directives
+csharp_using_directive_placement = outside_namespace:error
+
+# Namespace
+csharp_style_namespace_declarations = file_scoped:error
+
+# ============================================================
+# Naming rules
+# ============================================================
+
+# 1. Interfaces must begin with 'I'
+dotnet_naming_rule.interface_should_begin_with_i.severity = error
+dotnet_naming_rule.interface_should_begin_with_i.symbols = interface_symbols
+dotnet_naming_rule.interface_should_begin_with_i.style = begins_with_i_style
+
+dotnet_naming_symbols.interface_symbols.applicable_kinds = interface
+dotnet_naming_symbols.interface_symbols.applicable_accessibilities = *
+
+dotnet_naming_style.begins_with_i_style.required_prefix = I
+dotnet_naming_style.begins_with_i_style.capitalization = pascal_case
+
+# 2. Constants (any accessibility) must be PascalCase
+dotnet_naming_rule.constants_should_be_pascal_case.severity = error
+dotnet_naming_rule.constants_should_be_pascal_case.symbols = constant_symbols
+dotnet_naming_rule.constants_should_be_pascal_case.style = pascal_case_style
+
+dotnet_naming_symbols.constant_symbols.applicable_kinds = field
+dotnet_naming_symbols.constant_symbols.required_modifiers = const
+dotnet_naming_symbols.constant_symbols.applicable_accessibilities = *
+
+# 3. Static readonly fields (any accessibility) must be PascalCase
+dotnet_naming_rule.static_readonly_should_be_pascal_case.severity = error
+dotnet_naming_rule.static_readonly_should_be_pascal_case.symbols = static_readonly_symbols
+dotnet_naming_rule.static_readonly_should_be_pascal_case.style = pascal_case_style
+
+dotnet_naming_symbols.static_readonly_symbols.applicable_kinds = field
+dotnet_naming_symbols.static_readonly_symbols.required_modifiers = static, readonly
+dotnet_naming_symbols.static_readonly_symbols.applicable_accessibilities = *
+
+# 4. Static properties (any accessibility) must be PascalCase
+dotnet_naming_rule.static_properties_should_be_pascal_case.severity = error
+dotnet_naming_rule.static_properties_should_be_pascal_case.symbols = static_property_symbols
+dotnet_naming_rule.static_properties_should_be_pascal_case.style = pascal_case_style
+
+dotnet_naming_symbols.static_property_symbols.applicable_kinds = property
+dotnet_naming_symbols.static_property_symbols.required_modifiers = static
+dotnet_naming_symbols.static_property_symbols.applicable_accessibilities = *
+
+# 5. Public/internal members must be PascalCase
+dotnet_naming_rule.public_members_should_be_pascal_case.severity = error
+dotnet_naming_rule.public_members_should_be_pascal_case.symbols = public_symbols
+dotnet_naming_rule.public_members_should_be_pascal_case.style = pascal_case_style
+
+dotnet_naming_symbols.public_symbols.applicable_kinds = property, method, event, delegate
+dotnet_naming_symbols.public_symbols.applicable_accessibilities = public, internal, protected, protected_internal
+
+# 6. Private instance fields must be _camelCase
+dotnet_naming_rule.private_fields_should_be_underscore_camel.severity = error
+dotnet_naming_rule.private_fields_should_be_underscore_camel.symbols = private_field_symbols
+dotnet_naming_rule.private_fields_should_be_underscore_camel.style = underscore_camel_style
+
+dotnet_naming_symbols.private_field_symbols.applicable_kinds = field
+dotnet_naming_symbols.private_field_symbols.applicable_accessibilities = private
+dotnet_naming_symbols.private_field_symbols.required_modifiers =
+
+dotnet_naming_style.underscore_camel_style.required_prefix = _
+dotnet_naming_style.underscore_camel_style.capitalization = camel_case
+
+# Shared style
+dotnet_naming_style.pascal_case_style.capitalization = pascal_case

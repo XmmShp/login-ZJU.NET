@@ -1,0 +1,83 @@
+name: Bug 报告 / Bug Report
+description: 报告一个 Bug，例如登录流程失败
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢你提交 Bug 报告！请尽量提供详细信息以帮助我们定位问题。
+        Thanks for filing a bug report! Please provide as much detail as possible.
+
+  - type: dropdown
+    id: service
+    attributes:
+      label: 相关服务 / Affected Service
+      description: 哪个服务出现了问题？
+      options:
+        - ZjuamAuth (统一身份认证)
+        - CoursesService (学在浙大)
+        - ZdbkService (本科教学管理)
+        - ClassroomService (智云课堂)
+        - FormService (表单填报助手)
+        - YqfkglService (校园卡二维码)
+        - OpenService (浙大先生开放平台)
+        - EtaService (三全育人平台)
+        - Cc98Service (CC98)
+        - 其他 / Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 问题描述 / Description
+      description: 清晰简洁地描述这个 Bug
+      placeholder: 调用 FetchAsync 时抛出了 LoginException...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 复现步骤 / Steps to Reproduce
+      description: 请提供最小复现代码或步骤
+      placeholder: |
+        1. 创建 ZjuamAuth 实例
+        2. 调用 LoginServiceAsync(...)
+        3. 观察到异常
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期望行为 / Expected Behavior
+      description: 你期望发生什么？
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: 实际行为 / Actual Behavior
+      description: 实际发生了什么？请附上异常信息或日志。
+
+  - type: input
+    id: version
+    attributes:
+      label: 版本 / Package Version
+      description: "login-ZJU.NET 的版本号"
+      placeholder: "0.1.0"
+    validations:
+      required: true
+
+  - type: input
+    id: dotnet-version
+    attributes:
+      label: .NET 版本 / .NET Version
+      placeholder: ".NET 9.0"
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: 补充信息 / Additional Context
+      description: 其他任何可能有帮助的信息

@@ -1,0 +1,50 @@
+name: 功能请求 / Feature Request
+description: 提议一个新功能或新服务支持
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢你提出功能建议！
+        Thanks for suggesting a new feature!
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: 请求类型 / Request Type
+      options:
+        - 新增服务支持 (New service support)
+        - 现有服务增强 (Existing service enhancement)
+        - API 改进 (API improvement)
+        - 文档改进 (Documentation improvement)
+        - 其他 (Other)
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 描述 / Description
+      description: 清晰简洁地描述你想要的功能
+      placeholder: 希望能支持 xxx.zju.edu.cn 的登录...
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: 动机 / Motivation
+      description: 为什么需要这个功能？它解决了什么问题？
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 方案建议 / Proposed Solution
+      description: 如果你有实现思路，请在此描述
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: 补充信息 / Additional Context
+      description: 其他任何可能有帮助的信息（截图、链接等）

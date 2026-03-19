@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Src/login-ZJU.NET.csproj" />
+  <Project Path="Sample/login-ZJU.NET.Sample.csproj" />
+</Solution>

@@ -1,0 +1,11 @@
+login-ZJU.NET
+Copyright 2026 XmmShp
+
+This product is a C# / .NET port of the original "login-ZJU" library,
+which was created by 5dbwat4 and is licensed under the MIT License.
+
+Original project: https://github.com/5dbwat4/login-ZJU
+Original author:  5dbwat4 <me@5dbwat4.top> (https://github.com/5dbwat4)
+
+The full text of the original MIT license can be found in the
+THIRD-PARTY-NOTICES file included with this distribution.
