@@ -31,7 +31,7 @@ internal static class HttpRequestMessageHelper
         if (request.Content is not null)
         {
             var ms = new MemoryStream();
-            await request.Content.CopyToAsync(ms, cancellationToken);
+            await request.Content.CopyToAsync(ms, cancellationToken).ConfigureAwait(false);
             ms.Position = 0;
 
             clone.Content = new StreamContent(ms);

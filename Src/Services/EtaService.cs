@@ -31,11 +31,11 @@ public sealed class EtaService : ZjuServiceBase, IEtaService
     {
         Logger.LogInformation("[ETA] Login begins.");
 
-        var callbackUrl = await Auth.LoginServiceAsync(CheckUrl, cancellationToken);
+        var callbackUrl = await Auth.LoginServiceAsync(CheckUrl, cancellationToken).ConfigureAwait(false);
         Logger.LogDebug("[ETA] Callback URL: {Url}", callbackUrl);
 
         // Follow all redirects to finalize the session.
-        await Http.FollowAllRedirectsAsync(callbackUrl, cancellationToken);
+        await Http.FollowAllRedirectsAsync(callbackUrl, cancellationToken).ConfigureAwait(false);
 
         Logger.LogInformation("[ETA] Login finalized.");
     }

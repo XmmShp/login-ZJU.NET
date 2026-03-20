@@ -30,13 +30,13 @@ public sealed class ZdbkService : ZjuServiceBase, IZdbkService
 
         // Initialize session.
         await Http.SendAsync(
-            new HttpRequestMessage(HttpMethod.Post, InitUrl), cancellationToken);
+            new HttpRequestMessage(HttpMethod.Post, InitUrl), cancellationToken).ConfigureAwait(false);
 
         // Authenticate via ZJUAM CAS.
-        var callbackUrl = await Auth.LoginServiceAsync(ServiceUrl, cancellationToken);
+        var callbackUrl = await Auth.LoginServiceAsync(ServiceUrl, cancellationToken).ConfigureAwait(false);
         Logger.LogDebug("[ZDBK] Callback URL: {Url}", callbackUrl);
 
-        var response = await Http.GetAsync(callbackUrl, cancellationToken);
+        var response = await Http.GetAsync(callbackUrl, cancellationToken).ConfigureAwait(false);
 
         if (response.StatusCode != HttpStatusCode.Found)
         {

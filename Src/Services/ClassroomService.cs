@@ -28,15 +28,15 @@ public sealed class ClassroomService : ZjuServiceBase, IClassroomService
         Logger.LogInformation("[CLASSROOM] Login begins.");
 
         // Follow redirects from entry URL until we reach ZJUAM.
-        var zjuamUrl = await Http.FollowRedirectsUntilHostAsync(EntryUrl, ZjuamHost, cancellationToken);
+        var zjuamUrl = await Http.FollowRedirectsUntilHostAsync(EntryUrl, ZjuamHost, cancellationToken).ConfigureAwait(false);
         Logger.LogDebug("[CLASSROOM] Redirected to ZJUAM: {Url}", zjuamUrl);
 
         // Authenticate via ZJUAM OAuth2.
-        var callbackUrl = await Auth.LoginServiceOAuth2Async(zjuamUrl, cancellationToken);
+        var callbackUrl = await Auth.LoginServiceOAuth2Async(zjuamUrl, cancellationToken).ConfigureAwait(false);
         Logger.LogDebug("[CLASSROOM] Callback URL from ZJUAM: {Url}", callbackUrl);
 
         // Follow all remaining redirects, including meta-refresh.
-        await Http.FollowAllRedirectsAsync(callbackUrl, cancellationToken);
+        await Http.FollowAllRedirectsAsync(callbackUrl, cancellationToken).ConfigureAwait(false);
 
         Logger.LogInformation("[CLASSROOM] Login finalized.");
     }

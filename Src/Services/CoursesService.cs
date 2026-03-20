@@ -27,7 +27,7 @@ public sealed class CoursesService : ZjuServiceBase, ICoursesService
         Logger.LogInformation("[COURSES] Login begins.");
 
         // Follow redirects from entry URL until we reach ZJUAM.
-        var zjuamUrl = await Http.FollowRedirectsUntilHostAsync(EntryUrl, ZjuamHost, cancellationToken);
+        var zjuamUrl = await Http.FollowRedirectsUntilHostAsync(EntryUrl, ZjuamHost, cancellationToken).ConfigureAwait(false);
         Logger.LogDebug("[COURSES] Redirected to ZJUAM: {Url}", zjuamUrl);
 
         // Extract the service parameter and authenticate via ZJUAM.
@@ -39,11 +39,11 @@ public sealed class CoursesService : ZjuServiceBase, ICoursesService
             .FirstOrDefault()
             ?? throw new LoginException("[COURSES] Could not extract service parameter from ZJUAM URL.");
 
-        var callbackUrl = await Auth.LoginServiceAsync(service, cancellationToken);
+        var callbackUrl = await Auth.LoginServiceAsync(service, cancellationToken).ConfigureAwait(false);
         Logger.LogDebug("[COURSES] Callback URL from ZJUAM: {Url}", callbackUrl);
 
         // Follow all remaining redirects, including meta-refresh.
-        await Http.FollowAllRedirectsAsync(callbackUrl, cancellationToken);
+        await Http.FollowAllRedirectsAsync(callbackUrl, cancellationToken).ConfigureAwait(false);
 
         Logger.LogInformation("[COURSES] Login finalized.");
     }

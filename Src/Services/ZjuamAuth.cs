@@ -40,7 +40,7 @@ public sealed partial class ZjuamAuth : IZjuamAuth
 
     /// <inheritdoc />
     public async Task LoginAsync(CancellationToken cancellationToken = default)
-        => await EnsureLoggedInAsync(cancellationToken);
+        => await EnsureLoggedInAsync(cancellationToken).ConfigureAwait(false);
 
     /// <inheritdoc />
     public async Task<HttpResponseMessage> FetchAsync(
@@ -48,8 +48,8 @@ public sealed partial class ZjuamAuth : IZjuamAuth
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request);
-        await EnsureLoggedInAsync(cancellationToken);
-        return await _http.SendFollowingRedirectsAsync(request, cancellationToken);
+        await EnsureLoggedInAsync(cancellationToken).ConfigureAwait(false);
+        return await _http.SendFollowingRedirectsAsync(request, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -61,7 +61,7 @@ public sealed partial class ZjuamAuth : IZjuamAuth
 
         if (_loggedIn)
         {
-            var response = await _http.GetAsync(fullLoginUrl, cancellationToken);
+            var response = await _http.GetAsync(fullLoginUrl, cancellationToken).ConfigureAwait(false);
             _logger.LogDebug("[ZJUAM] loginSvc response: {Status} {Location}",
                 (int)response.StatusCode, response.Headers.Location);
 
@@ -72,14 +72,14 @@ public sealed partial class ZjuamAuth : IZjuamAuth
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
-                return await LoginCoreAsync(fullLoginUrl, cancellationToken);
+                return await LoginCoreAsync(fullLoginUrl, cancellationToken).ConfigureAwait(false);
             }
 
             throw new LoginException(
                 $"Login to service failed with status {(int)response.StatusCode}.");
         }
 
-        return await LoginCoreAsync(fullLoginUrl, cancellationToken);
+        return await LoginCoreAsync(fullLoginUrl, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -87,13 +87,13 @@ public sealed partial class ZjuamAuth : IZjuamAuth
         string redirectUrl, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation("[ZJUAM] Attempting OAuth2 login: {RedirectUrl}", redirectUrl);
-        await EnsureLoggedInAsync(cancellationToken);
+        await EnsureLoggedInAsync(cancellationToken).ConfigureAwait(false);
 
         var currentUrl = redirectUrl;
         while (new Uri(currentUrl).Host.Equals(ZjuamHost, StringComparison.OrdinalIgnoreCase))
         {
             _logger.LogDebug("[ZJUAM] OAuth2 redirect: {Url}", currentUrl);
-            var response = await _http.GetAsync(currentUrl, cancellationToken);
+            var response = await _http.GetAsync(currentUrl, cancellationToken).ConfigureAwait(false);
             currentUrl = response.Headers.Location?.ToString()
                 ?? throw new LoginException("No redirect location found during OAuth2 login.");
         }
@@ -108,12 +108,12 @@ public sealed partial class ZjuamAuth : IZjuamAuth
             return;
         }
 
-        await _loginLock.WaitAsync(ct);
+        await _loginLock.WaitAsync(ct).ConfigureAwait(false);
         try
         {
             if (!_loggedIn)
             {
-                await LoginCoreAsync(CasLoginUrl, ct);
+                await LoginCoreAsync(CasLoginUrl, ct).ConfigureAwait(false);
             }
         }
         finally
@@ -129,8 +129,8 @@ public sealed partial class ZjuamAuth : IZjuamAuth
         // Step 1: GET login page to obtain the execution token and populate cookies.
         // Must follow redirects here (the CAS server may redirect before serving the login form).
         var pageResponse = await _http.SendFollowingRedirectsAsync(
-            new HttpRequestMessage(HttpMethod.Get, loginUrl), ct);
-        var html = await pageResponse.Content.ReadAsStringAsync(ct);
+            new HttpRequestMessage(HttpMethod.Get, loginUrl), ct).ConfigureAwait(false);
+        var html = await pageResponse.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
 
         var executionMatch = ExecutionPattern().Match(html);
         if (!executionMatch.Success)
@@ -141,8 +141,8 @@ public sealed partial class ZjuamAuth : IZjuamAuth
         var execution = executionMatch.Groups[1].Value;
 
         // Step 2: Fetch the RSA public key.
-        var pubKeyResponse = await _http.GetAsync(PubKeyUrl, ct);
-        var pubKeyJson = await pubKeyResponse.Content.ReadAsStringAsync(ct);
+        var pubKeyResponse = await _http.GetAsync(PubKeyUrl, ct).ConfigureAwait(false);
+        var pubKeyJson = await pubKeyResponse.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
 
         var modulusMatch = ModulusPattern().Match(pubKeyJson);
         var exponentMatch = ExponentPattern().Match(pubKeyJson);
@@ -169,7 +169,7 @@ public sealed partial class ZjuamAuth : IZjuamAuth
             Content = formContent,
         };
 
-        var loginResponse = await _http.SendAsync(loginRequest, ct);
+        var loginResponse = await _http.SendAsync(loginRequest, ct).ConfigureAwait(false);
 
         if (loginResponse.StatusCode == HttpStatusCode.Found)
         {
@@ -180,7 +180,7 @@ public sealed partial class ZjuamAuth : IZjuamAuth
 
         if (loginResponse.StatusCode == HttpStatusCode.OK)
         {
-            var responseHtml = await loginResponse.Content.ReadAsStringAsync(ct);
+            var responseHtml = await loginResponse.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
             var msgMatch = ErrorMsgPattern().Match(responseHtml);
             var message = msgMatch.Success ? msgMatch.Groups[1].Value : "Unknown error";
             throw new LoginException($"Login failed: {message}");

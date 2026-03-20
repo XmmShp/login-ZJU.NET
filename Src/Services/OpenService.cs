@@ -55,8 +55,8 @@ public sealed class OpenService : ZjuServiceBase, IOpenService
             prepareRequest.Headers.TryAddWithoutValidation(key, value);
         }
 
-        var prepareResponse = await Http.SendAsync(prepareRequest, cancellationToken);
-        var prepareJson = await prepareResponse.Content.ReadAsStringAsync(cancellationToken);
+        var prepareResponse = await Http.SendAsync(prepareRequest, cancellationToken).ConfigureAwait(false);
+        var prepareJson = await prepareResponse.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
         using var doc = JsonDocument.Parse(prepareJson);
         if (!doc.RootElement.TryGetProperty("redirect_uri", out var redirectUriProp))
@@ -70,16 +70,16 @@ public sealed class OpenService : ZjuServiceBase, IOpenService
         Logger.LogDebug("[OPEN] Redirecting to ZJUAM: {Url}", redirectUri);
 
         // Step 2: Authenticate via ZJUAM OAuth2.
-        var callbackUrl = await Auth.LoginServiceOAuth2Async(redirectUri, cancellationToken);
+        var callbackUrl = await Auth.LoginServiceOAuth2Async(redirectUri, cancellationToken).ConfigureAwait(false);
         Logger.LogDebug("[OPEN] Returned from ZJUAM: {Url}", callbackUrl);
 
         // Step 3: Follow the callback redirect.
-        var callbackResponse = await Http.GetAsync(callbackUrl, cancellationToken);
+        var callbackResponse = await Http.GetAsync(callbackUrl, cancellationToken).ConfigureAwait(false);
         var finalLocation = callbackResponse.Headers.Location?.ToString();
         if (finalLocation is not null)
         {
             var finalUrl = new Uri(new Uri("https://open.zju.edu.cn"), finalLocation).ToString();
-            await Http.GetAsync(finalUrl, cancellationToken);
+            await Http.GetAsync(finalUrl, cancellationToken).ConfigureAwait(false);
         }
 
         // Step 4: Extract x-csrf-token from cookies.
@@ -95,7 +95,7 @@ public sealed class OpenService : ZjuServiceBase, IOpenService
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request);
-        await EnsureLoggedInAsync(cancellationToken);
+        await EnsureLoggedInAsync(cancellationToken).ConfigureAwait(false);
 
         // Apply the required headers for open.zju.edu.cn.
         foreach (var (key, value) in SaferHeaders)
@@ -108,6 +108,6 @@ public sealed class OpenService : ZjuServiceBase, IOpenService
 
         request.Headers.TryAddWithoutValidation("x-csrf-token", _xcsrfToken);
 
-        return await Http.SendFollowingRedirectsAsync(request, cancellationToken);
+        return await Http.SendFollowingRedirectsAsync(request, cancellationToken).ConfigureAwait(false);
     }
 }

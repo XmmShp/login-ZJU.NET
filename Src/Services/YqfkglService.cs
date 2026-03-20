@@ -26,14 +26,14 @@ public sealed class YqfkglService : ZjuServiceBase, IYqfkglService
         Logger.LogInformation("[YQFKGL] Login begins.");
 
         // Pre-visit the service URL to establish initial cookies.
-        await Http.GetAsync(ServiceUrl, cancellationToken);
+        await Http.GetAsync(ServiceUrl, cancellationToken).ConfigureAwait(false);
 
         // Authenticate via ZJUAM CAS.
-        var callbackUrl = await Auth.LoginServiceAsync(ServiceUrl, cancellationToken);
+        var callbackUrl = await Auth.LoginServiceAsync(ServiceUrl, cancellationToken).ConfigureAwait(false);
         Logger.LogDebug("[YQFKGL] Callback URL: {Url}", callbackUrl);
 
         // Follow the callback to finalize the session.
-        await Http.GetAsync(callbackUrl, cancellationToken);
+        await Http.GetAsync(callbackUrl, cancellationToken).ConfigureAwait(false);
 
         Logger.LogInformation("[YQFKGL] Login finalized.");
     }

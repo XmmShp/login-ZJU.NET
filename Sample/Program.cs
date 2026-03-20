@@ -23,17 +23,15 @@ var anyZjuamTest = IsEnabled("TEST_ZJUAM") || IsEnabled("TEST_ZDBK") || IsEnable
 
 var services = new ServiceCollection();
 services.AddLogging(builder => builder.AddConsole().SetMinimumLevel(LogLevel.Information));
-services.AddLoginZju();
 
 var cc98ClientId = Environment.GetEnvironmentVariable("CC98_CLIENT_ID");
-if (cc98ClientId is not null)
-{
-    services.AddLoginZjuCc98(options =>
+services.AddLoginZju(cc98ClientId is null
+    ? null
+    : options =>
     {
         options.ClientId = cc98ClientId;
         options.ClientSecret = Env("CC98_CLIENT_SECRET");
     });
-}
 
 await using var provider = services.BuildServiceProvider();
 var factory = provider.GetRequiredService<ILoginZjuFactory>();

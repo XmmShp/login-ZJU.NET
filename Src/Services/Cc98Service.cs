@@ -64,8 +64,8 @@ public sealed class Cc98Service : ICc98Service
             new KeyValuePair<string, string>("grant_type", "password")
         ]);
 
-        var response = await _httpClient.PostAsync(TokenUrl, content, cancellationToken);
-        var json = await response.Content.ReadAsStringAsync(cancellationToken);
+        var response = await _httpClient.PostAsync(TokenUrl, content, cancellationToken).ConfigureAwait(false);
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -85,17 +85,17 @@ public sealed class Cc98Service : ICc98Service
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request);
-        await EnsureLoggedInAsync(cancellationToken);
+        await EnsureLoggedInAsync(cancellationToken).ConfigureAwait(false);
 
         // Refresh the token if it's about to expire.
         if (DateTime.UtcNow >= _expiresAt.AddSeconds(-60))
         {
-            await RefreshTokenAsync(cancellationToken);
+            await RefreshTokenAsync(cancellationToken).ConfigureAwait(false);
         }
 
         request.Headers.TryAddWithoutValidation("Authorization", $"{_tokenType} {_accessToken}");
 
-        return await _httpClient.SendAsync(request, cancellationToken);
+        return await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
     }
 
     private async Task RefreshTokenAsync(CancellationToken ct)
@@ -109,8 +109,8 @@ public sealed class Cc98Service : ICc98Service
             new KeyValuePair<string, string>("grant_type", "refresh_token")
         ]);
 
-        var response = await _httpClient.PostAsync(TokenUrl, content, ct);
-        var json = await response.Content.ReadAsStringAsync(ct);
+        var response = await _httpClient.PostAsync(TokenUrl, content, ct).ConfigureAwait(false);
+        var json = await response.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -143,12 +143,12 @@ public sealed class Cc98Service : ICc98Service
             return;
         }
 
-        await _loginLock.WaitAsync(ct);
+        await _loginLock.WaitAsync(ct).ConfigureAwait(false);
         try
         {
             if (string.IsNullOrEmpty(_accessToken))
             {
-                await LoginAsync(ct);
+                await LoginAsync(ct).ConfigureAwait(false);
             }
         }
         finally

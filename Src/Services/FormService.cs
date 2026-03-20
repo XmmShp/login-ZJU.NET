@@ -41,15 +41,15 @@ public sealed class FormService : IFormService
     {
         _logger.LogInformation("[FORM] Login begins.");
 
-        var callbackUrl = await _auth.LoginServiceAsync(ServiceUrl, cancellationToken);
+        var callbackUrl = await _auth.LoginServiceAsync(ServiceUrl, cancellationToken).ConfigureAwait(false);
         var ticket = ExtractTicket(callbackUrl);
         var encodedTicket = EncryptTicket(ticket);
 
         var validateUrl =
             $"https://form.zju.edu.cn/dfi/validateLogin?ticket={encodedTicket}&service={Uri.EscapeDataString(ServiceUrl)}";
 
-        var response = await _httpClient.GetAsync(validateUrl, cancellationToken);
-        var json = await response.Content.ReadAsStringAsync(cancellationToken);
+        var response = await _httpClient.GetAsync(validateUrl, cancellationToken).ConfigureAwait(false);
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
         using var doc = JsonDocument.Parse(json);
         var root = doc.RootElement;
@@ -72,22 +72,22 @@ public sealed class FormService : IFormService
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request);
-        await EnsureLoggedInAsync(cancellationToken);
+        await EnsureLoggedInAsync(cancellationToken).ConfigureAwait(false);
 
-        using var firstRequest = await HttpRequestMessageHelper.CloneAsync(request, cancellationToken);
+        using var firstRequest = await HttpRequestMessageHelper.CloneAsync(request, cancellationToken).ConfigureAwait(false);
         firstRequest.Headers.TryAddWithoutValidation("authentication", _token);
 
-        var response = await _httpClient.SendAsync(firstRequest, cancellationToken);
+        var response = await _httpClient.SendAsync(firstRequest, cancellationToken).ConfigureAwait(false);
 
         if (response.StatusCode == HttpStatusCode.Unauthorized || response.StatusCode == HttpStatusCode.Forbidden)
         {
             _logger.LogWarning("[FORM] Token expired, re-authenticating...");
             _token = "";
-            await LoginAsync(cancellationToken);
+            await LoginAsync(cancellationToken).ConfigureAwait(false);
 
-            using var retryRequest = await HttpRequestMessageHelper.CloneAsync(request, cancellationToken);
+            using var retryRequest = await HttpRequestMessageHelper.CloneAsync(request, cancellationToken).ConfigureAwait(false);
             retryRequest.Headers.TryAddWithoutValidation("authentication", _token);
-            response = await _httpClient.SendAsync(retryRequest, cancellationToken);
+            response = await _httpClient.SendAsync(retryRequest, cancellationToken).ConfigureAwait(false);
         }
 
         return response;
@@ -100,12 +100,12 @@ public sealed class FormService : IFormService
             return;
         }
 
-        await _loginLock.WaitAsync(ct);
+        await _loginLock.WaitAsync(ct).ConfigureAwait(false);
         try
         {
             if (string.IsNullOrEmpty(_token))
             {
-                await LoginAsync(ct);
+                await LoginAsync(ct).ConfigureAwait(false);
             }
         }
         finally

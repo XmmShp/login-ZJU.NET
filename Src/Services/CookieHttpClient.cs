@@ -48,7 +48,7 @@ internal sealed partial class CookieHttpClient : IDisposable
     public async Task<HttpResponseMessage> SendFollowingRedirectsAsync(
         HttpRequestMessage request, CancellationToken ct = default)
     {
-        var response = await _client.SendAsync(request, ct);
+        var response = await _client.SendAsync(request, ct).ConfigureAwait(false);
         while (IsRedirect(response.StatusCode))
         {
             var location = ResolveLocation(request.RequestUri!, response);
@@ -57,7 +57,7 @@ internal sealed partial class CookieHttpClient : IDisposable
                 break;
             }
             request = new HttpRequestMessage(HttpMethod.Get, location);
-            response = await _client.SendAsync(request, ct);
+            response = await _client.SendAsync(request, ct).ConfigureAwait(false);
         }
         return response;
     }
@@ -72,7 +72,7 @@ internal sealed partial class CookieHttpClient : IDisposable
         var currentUrl = startUrl;
         while (!new Uri(currentUrl).Host.Equals(targetHost, StringComparison.OrdinalIgnoreCase))
         {
-            var response = await GetAsync(currentUrl, ct);
+            var response = await GetAsync(currentUrl, ct).ConfigureAwait(false);
             var location = ResolveLocation(new Uri(currentUrl), response);
             currentUrl = location?.ToString()
                 ?? throw new LoginException($"No redirect location found at {currentUrl}");
@@ -89,7 +89,7 @@ internal sealed partial class CookieHttpClient : IDisposable
         var currentUrl = startUrl;
         while (true)
         {
-            var response = await GetAsync(currentUrl, ct);
+            var response = await GetAsync(currentUrl, ct).ConfigureAwait(false);
 
             if (IsRedirect(response.StatusCode))
             {
@@ -105,7 +105,7 @@ internal sealed partial class CookieHttpClient : IDisposable
             // Check for HTML meta-refresh redirect
             if (response.StatusCode == HttpStatusCode.OK)
             {
-                var content = await response.Content.ReadAsStringAsync(ct);
+                var content = await response.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
                 var match = MetaRefreshPattern().Match(content);
                 if (match.Success)
                 {

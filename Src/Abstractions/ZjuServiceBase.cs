@@ -32,8 +32,8 @@ public abstract class ZjuServiceBase : IZjuService
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request);
-        await EnsureLoggedInAsync(cancellationToken);
-        return await Http.SendFollowingRedirectsAsync(request, cancellationToken);
+        await EnsureLoggedInAsync(cancellationToken).ConfigureAwait(false);
+        return await Http.SendFollowingRedirectsAsync(request, cancellationToken).ConfigureAwait(false);
     }
 
     private protected async Task EnsureLoggedInAsync(CancellationToken ct)
@@ -43,12 +43,12 @@ public abstract class ZjuServiceBase : IZjuService
             return;
         }
 
-        await _loginLock.WaitAsync(ct);
+        await _loginLock.WaitAsync(ct).ConfigureAwait(false);
         try
         {
             if (!_loggedIn)
             {
-                await LoginAsync(ct);
+                await LoginAsync(ct).ConfigureAwait(false);
                 _loggedIn = true;
             }
         }
